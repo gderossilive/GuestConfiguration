@@ -12,17 +12,6 @@ Install-Module -Name SqlServerDsc -Force
 Install-Module sqlserver -Force
 #Install-Module -Name Az -Repository PSGallery -Force
 
-$servicePrincipalClientId='20da7b2c-dd06-4080-b33d-e07292501cf8'; # ArcDeploySP-qzfc0
-$servicePrincipalSecret='K~H8Q~Uq-Nf.WUHfa0oLUsCmGlagFOgOF2b~jc4X';
-$TenantId = '16b3c013-d300-468d-ac64-7eda0820b6d3';
-
-# Variables
-$StorageAccountName = "gdrrepo3423"
-$ContainerName = "iso"
-$BlobName = "SQLServer2022-x64-ENU.iso"
-$Resource = "https://gdrrepo3423.blob.core.windows.net"
-
-
 # Get the access token
 $Body = @{
     grant_type    = "client_credentials"
