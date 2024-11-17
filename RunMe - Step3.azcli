@@ -10,7 +10,6 @@ ArcSqllist="[\"$ArcSqlVMname\"]"
 StoragAccountName="gdrrepo3423"
 ContainerName="iso"
 BlobName="SQLServer2022-x64-ENU.iso"
-Resource="https://$StoragAccountName.blob.core.windows.net"
 
 # Assign the 'Storage Blob Data Reader' to the Service Principal to allow it to download the SQLServer ISO
 az role assignment create --assignee $ArcSp_id \
@@ -28,7 +27,7 @@ az connectedmachine extension create \
      --resource-group "$Seed-Demo" \
      --type "CustomScriptExtension" \
      --publisher "Microsoft.Compute" \
-     --settings "{\"script\":\"Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/gderossilive/Arcv2/main/Files/ArcForServer.ps1' -OutFile 'c:\\windows\\temp\\step1.ps1'; powershell -File 'c:\\windows\\temp\\step1.ps1' -SubscriptionId $MySubscriptionId -TenantId $MyTenantId -ResourceGroupName $Seed-Demo -Location $location -ServicePrincipalId $ArcSp_id -Password $ArcSp_pwd -EnableArcAutoupdate=1 -EnableSSH=1\"}" \
+     --settings "{\"script\":\"Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/gderossilive/GuestConfiguration/refs/heads/main/Files/IsoSetup.ps1' -OutFile 'c:\\windows\\temp\\IsoSetup.ps1'; powershell -File 'c:\\windows\\temp\\IsoSetup.ps1' -servicePrincipalClientId $ArcSp_id -servicePrincipalSecret $ArcSp_pwd -TenantId $MyTenantId -StorageAccountName $StoragAccountName -ContainerName $ContainerName -BlobName $BlobName \"}" \
      --enable-auto-upgrade true
 
 az connectedmachine extension create \
