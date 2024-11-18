@@ -7,12 +7,14 @@ param(
     [string] $BlobName
 )
 
+Write-Host "Installing necessary packages..." -ForegroundColor Green
 Install-Module -Name SqlServerDsc -Force
 Install-Module sqlserver -Force
 #Install-Module -Name Az -Repository PSGallery -Force
 
 $Resource="https://$StorageAccountName.blob.core.windows.net"
 
+Write-Host "Getting access token..." -ForegroundColor Green
 # Get the access token
 $Body = @{
     grant_type    = "client_credentials"
@@ -29,13 +31,17 @@ $Headers = @{
     "x-ms-version"  = "2020-08-04"
 }
 
+Write-Host "Downloading SQL Server ISO..." -ForegroundColor Green
 # Download the SQL Server ISO
 Invoke-WebRequest -Uri "https://$StorageAccountName.blob.core.windows.net/$ContainerName/$BlobName" -Headers $Headers -Method Get -OutFile "D:\SQLServer2022-x64-ENU.iso"
 
+Write-Host "Copying SQL Server ISO content to C:\SQL2022..." -ForegroundColor Green
 # Copy the ISO content to C:\SQL2022
 New-Item -Path C:\SQL2022 -ItemType Directory
 $mountResult = Mount-DiskImage -ImagePath 'D:\SQLServer2022-x64-ENU.iso' -PassThru
 $volumeInfo = $mountResult | Get-Volume
 $driveInfo = Get-PSDrive -Name $volumeInfo.DriveLetter
 Copy-Item -Path ( Join-Path -Path $driveInfo.Root -ChildPath '*' ) -Destination 'C:\SQL2022\' -Recurse -Force
+Write-Host "unmounting the ISO..." -ForegroundColor Green
 Dismount-DiskImage -ImagePath 'D:\SQLServer2022-x64-ENU.iso'
+Write-Host "Done." -ForegroundColor Green
