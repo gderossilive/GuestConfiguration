@@ -19,7 +19,6 @@ az role assignment create --assignee $ArcSp_id \
 # Allow installing extensions without prompt
 az config set extension.use_dynamic_install=yes_without_prompt
 
-echo "powershell Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/gderossilive/GuestConfiguration/refs/heads/main/Files/IsoSetup.ps1' -OutFile 'c:\\windows\\temp\\IsoSetup.ps1'; powershell -File 'c:\\windows\\temp\\IsoSetup.ps1' -servicePrincipalClientId $ArcSp_id -servicePrincipalSecret $ArcSp_pwd -TenantId $MyTenantId -StorageAccountName $StorageAccountName -ContainerName $ContainerName -BlobName $BlobName -Force"
 # setup the CustomScript extension on the Arc enabled VM
 az connectedmachine extension create \
      --machine-name $ArcSqlVMname \
@@ -30,6 +29,16 @@ az connectedmachine extension create \
      --publisher "Microsoft.Compute" \
      --settings "{\"commandToExecute\":\"powershell Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/gderossilive/GuestConfiguration/refs/heads/main/Files/IsoSetup.ps1' -OutFile 'c:\\windows\\temp\\IsoSetup.ps1'; powershell -File 'c:\\windows\\temp\\IsoSetup.ps1' -servicePrincipalClientId $ArcSp_id -servicePrincipalSecret $ArcSp_pwd -TenantId $MyTenantId -StorageAccountName $StorageAccountName -ContainerName $ContainerName -BlobName $BlobName -Force \"}" \
      --enable-auto-upgrade true
+
+# setup the GuestConfiguration extension on the Arc enabled VM to install SQL Server
+az connectedmachine extension create \
+	 --machine-name $ArcSqlVMname \
+	 --location $location \
+	 --name 'GuestConfiguration' \
+	 --resource-group "$Seed-Demo" \
+	 --type "GuestConfiguration" \
+	 --publisher "Microsoft.GuestConfiguration" \
+	 --settings "{\"configurationMode\":\"ApplyAndMonitor\",\"configurationModeFrequencyMins\":15,\"refreshFrequencyMins\":15,\"configurationModeFrequencyMins\":15,\"configurationMode\":\"ApplyAndMonitor\",\"
 
 az connectedmachine extension create \
 	--machine-name $ArcWinVMname \
