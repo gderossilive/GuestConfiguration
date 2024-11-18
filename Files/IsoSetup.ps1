@@ -1,6 +1,6 @@
 param(
     [string] $servicePrincipalClientId,
-    [securestring] $servicePrincipalSecret,
+    [string] $servicePrincipalSecret,
     [string] $TenantId,
     [string] $StorageAccountName,
     [string] $ContainerName,

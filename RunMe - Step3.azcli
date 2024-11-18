@@ -11,14 +11,16 @@ StoragAccountName="gdrrepo3423"
 ContainerName="iso"
 BlobName="SQLServer2022-x64-ENU.iso"
 
+
 # Assign the 'Storage Blob Data Reader' to the Service Principal to allow it to download the SQLServer ISO
 az role assignment create --assignee $ArcSp_id \
      --role "Storage Blob Data Reader" \
-     --scope "/subscriptions/$MySubscriptionId/resourceGroups/$Seed-Demo/providers/Microsoft.Storage/storageAccounts/$StoragAccountName/blobServices/default/containers/$ContainerName"
+     --scope "/subscriptions/$MySubscriptionId/resourceGroups/GdrRepo/providers/Microsoft.Storage/storageAccounts/$StoragAccountName/blobServices/default/containers/$ContainerName"
 
 # Allow installing extensions without prompt
 az config set extension.use_dynamic_install=yes_without_prompt
 
+echo "powershell Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/gderossilive/GuestConfiguration/refs/heads/main/Files/IsoSetup.ps1' -OutFile 'c:\\windows\\temp\\IsoSetup.ps1'; powershell -File 'c:\\windows\\temp\\IsoSetup.ps1' -servicePrincipalClientId $ArcSp_id -servicePrincipalSecret $ArcSp_pwd -TenantId $MyTenantId -StorageAccountName $StoragAccountName -ContainerName $ContainerName -BlobName $BlobName"
 # setup the CustomScript extension on the Arc enabled VM
 az connectedmachine extension create \
      --machine-name $ArcSqlVMname \
@@ -27,7 +29,7 @@ az connectedmachine extension create \
      --resource-group "$Seed-Demo" \
      --type "CustomScriptExtension" \
      --publisher "Microsoft.Compute" \
-     --settings "{\"script\":\"Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/gderossilive/GuestConfiguration/refs/heads/main/Files/IsoSetup.ps1' -OutFile 'c:\\windows\\temp\\IsoSetup.ps1'; powershell -File 'c:\\windows\\temp\\IsoSetup.ps1' -servicePrincipalClientId $ArcSp_id -servicePrincipalSecret $ArcSp_pwd -TenantId $MyTenantId -StorageAccountName $StoragAccountName -ContainerName $ContainerName -BlobName $BlobName \"}" \
+     --settings "{\"commandToExecute\":\"powershell Invoke-WebRequest -UseBasicParsing -Uri 'https://raw.githubusercontent.com/gderossilive/GuestConfiguration/refs/heads/main/Files/IsoSetup.ps1' -OutFile 'c:\\windows\\temp\\IsoSetup.ps1'; powershell -File 'c:\\windows\\temp\\IsoSetup.ps1' -servicePrincipalClientId $ArcSp_id -servicePrincipalSecret $ArcSp_pwd -TenantId $MyTenantId -StorageAccountName $StoragAccountName -ContainerName $ContainerName -BlobName $BlobName \"}" \
      --enable-auto-upgrade true
 
 az connectedmachine extension create \
