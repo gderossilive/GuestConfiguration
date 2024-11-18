@@ -31,15 +31,15 @@ az connectedmachine extension create \
      --enable-auto-upgrade true
 
 # setup the GuestConfiguration extension on the Arc enabled VM to install SQL Server
-az connectedmachine extension create \
-	 --machine-name $ArcSqlVMname \
-	 --location $location \
-	 --name 'GuestConfiguration' \
+az deployment group create \
+	--name "SqlDscSetup-$Seed" \
 	 --resource-group "$Seed-Demo" \
-	 --type "GuestConfiguration" \
-	 --publisher "Microsoft.GuestConfiguration" \
-	 --settings "{\"configurationMode\":\"ApplyAndMonitor\",\"configurationModeFrequencyMins\":15,\"refreshFrequencyMins\":15,\"configurationModeFrequencyMins\":15,\"configurationMode\":\"ApplyAndMonitor\",\"
+	 --template-file './src/SQLInstallDSC.bicep' \
+	 --parameters \
+		  sqlServerName=$ArcSqlVMname 
 
+
+# ------------------ END OF FILE ------------------
 az connectedmachine extension create \
 	--machine-name $ArcWinVMname \
 	--location $location \
