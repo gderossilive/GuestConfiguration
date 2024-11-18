@@ -12,7 +12,7 @@ Install-Module -Name SqlServerDsc -Force
 Install-Module sqlserver -Force
 #Install-Module -Name Az -Repository PSGallery -Force
 
-Resource="https://$StoragAccountName.blob.core.windows.net"
+$Resource="https://$StoragAccountName.blob.core.windows.net"
 
 # Get the access token
 $Body = @{
