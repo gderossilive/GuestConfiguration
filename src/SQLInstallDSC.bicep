@@ -31,7 +31,7 @@ resource myConfiguration 'Microsoft.GuestConfiguration/guestConfigurationAssignm
       name: sqlServerName
       contentUri: contentUri
       contentHash: contentHash
-      version: '1.*'
+      version: '1.0'
       assignmentType: 'ApplyAndMonitor'
     }
   }
