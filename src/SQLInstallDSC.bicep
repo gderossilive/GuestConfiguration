@@ -1,7 +1,7 @@
 param sqlServerName string
 param location string = resourceGroup().location
 param contentUri string = 'https://github.com/gderossilive/GuestConfiguration/raw/refs/heads/main/Files/SQLServerInstall.zip'
-param contentHash string = '0c4eb70f0b3f4f61f920444ed9c7f499290173a428b2fd1d289824b559fff3b6'
+param contentHash string = 'ac94b0f0911522bb5bd83bb5c665acedb93b03714159cfd207e812c2556e36e4'
 
 
 resource myVM 'Microsoft.HybridCompute/machines@2024-07-10' existing = {
