@@ -3,11 +3,6 @@ param location string = resourceGroup().location
 param contentUri string = 'https://github.com/gderossilive/GuestConfiguration/raw/refs/heads/main/Files/SQLServerInstall.zip'
 param contentHash string 
 param version string = '1.0'
-param timestamp string = utcNow()
-
-var salt = substring(uniqueString(resourceGroup().name, timestamp),0,3)
-var configName = 'SQLServerInstall-${salt}'
-
 
 resource myVM 'Microsoft.HybridCompute/machines@2024-07-10' existing = {
   name: sqlServerName
@@ -28,7 +23,7 @@ resource vmExtension 'Microsoft.HybridCompute/machines/extensions@2024-07-31-pre
 }*/
 
 resource myConfiguration 'Microsoft.GuestConfiguration/guestConfigurationAssignments@2020-06-25' = {
-  name: configName
+  name: sqlServerName
   scope: myVM
   location: location
   properties: {
