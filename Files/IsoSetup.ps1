@@ -33,6 +33,7 @@ $Headers = @{
 
 Write-Host "Downloading SQL Server ISO..." -ForegroundColor Green
 # Download the SQL Server ISO
+$ProgressPreference = 'SilentlyContinue'
 Invoke-WebRequest -Uri "https://$StorageAccountName.blob.core.windows.net/$ContainerName/$BlobName" -Headers $Headers -Method Get -OutFile "D:\SQLServer2022-x64-ENU.iso"
 
 Write-Host "Copying SQL Server ISO content to C:\SQL2022..." -ForegroundColor Green
