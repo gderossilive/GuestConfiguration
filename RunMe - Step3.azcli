@@ -36,7 +36,9 @@ az deployment group create \
 	 --resource-group "$Seed-Demo" \
 	 --template-file './src/SQLInstallDSC.bicep' \
 	 --parameters \
-		  sqlServerName=$ArcSqlVMname 
+		  sqlServerName=$ArcSqlVMname \
+		  version='1.3' \
+		  contentHash='ac94b0f0911522bb5bd83bb5c665acedb93b03714159cfd207e812c2556e36e4'
 
 
 # ------------------ END OF FILE ------------------
