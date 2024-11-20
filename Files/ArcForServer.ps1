@@ -30,6 +30,7 @@ $env:CLOUD = "AzureCloud";
 
 # Download the package
 Write-Host "Downloading the Arc Agent package" -foreground Green
+$ProgressPreference = 'SilentlyContinue'
 if ($Proxy) {
     Invoke-WebRequest -proxy $Proxy -Uri https://aka.ms/AzureConnectedMachineAgent -OutFile AzureConnectedMachineAgent.msi
 } else {
