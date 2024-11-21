@@ -37,7 +37,7 @@ $ProgressPreference = 'SilentlyContinue'
 #Invoke-WebRequest -Uri "https://$StorageAccountName.blob.core.windows.net/$ContainerName/$BlobName" -Headers $Headers -Method Get -OutFile "D:\SQLServer2022-x64-ENU.iso"
 Invoke-WebRequest -Uri "https://aka.ms/downloadazcopy-v10-windows" -OutFile "D:\azcopy.zip"
 Expand-Archive -Path "D:\azcopy.zip" -DestinationPath "D:\"
-Copy-Item -Path "D:\azcopy.exe" -Destination "C:\Windows\System32\"
+Copy-Item -Path "D:\azcopy_windows_amd64_10.27.1\azcopy.exe" -Destination "C:\Windows\System32\"
 azcopy "https://$StorageAccountName.blob.core.windows.net/$ContainerName/$BlobName" "D:\SQLServer2022-x64-ENU.iso"
 
 Write-Host "Copying SQL Server ISO content to C:\SQL2022..." -ForegroundColor Green
