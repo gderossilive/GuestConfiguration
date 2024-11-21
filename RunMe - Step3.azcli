@@ -12,17 +12,17 @@ ContainerName="iso"
 BlobName="SQLServer2022-x64-ENU.iso"
 
 # Retrieve the System Managed identity for the Arc enabled VM
-ArcManagedIdentity=$(az connectedmachine show --resource-group $Seed-Demo --name $ArcSqlVMname --query identity.principalId --output tsv)
+ArcVmManagedIdentity=$(az connectedmachine show --resource-group $Seed-Demo --name $ArcSqlVMname --query identity.principalId --output tsv)
 
 # Assign the 'Storage Blob Data Reader' to the Service Principal to allow it to download the SQLServer ISO
-az role assignment create --assignee $ArcManagedIdentity \
+az role assignment create --assignee $ArcVmManagedIdentity \
      --role 'Storage Blob Data Reader' \
-     --scope "//subscriptions/$MySubscriptionId/resourceGroups/GdrRepo/providers/Microsoft.Storage/storageAccounts/$StorageAccountName/blobServices/default/containers/$ContainerName"
+     --scope "//subscriptions/$MySubscriptionId/resourceGroups/GdrRepo/providers/Microsoft.Storage/storageAccounts/$StorageAccountName/"
 
 # Allow installing extensions without prompt
 az config set extension.use_dynamic_install=yes_without_prompt
 
-echo "powershell Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/gderossilive/GuestConfiguration/refs/heads/main/Files/IsoSetup.ps1' -OutFile 'c:\\windows\\\\temp\\IsoSetup.ps1'; powershell -File 'c:\\windows\\\\temp\\IsoSetup.ps1' -servicePrincipalClientId $ArcSp_id -servicePrincipalSecret $ArcSp_pwd -TenantId $MyTenantId -StorageAccountName $StorageAccountName -ContainerName $ContainerName -BlobName $BlobName -Force "
+echo "powershell Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/gderossilive/GuestConfiguration/refs/heads/main/Files/IsoSetup.ps1' -OutFile 'c:\\windows\\\temp\\IsoSetup.ps1'; powershell -File 'c:\\windows\\\temp\\IsoSetup.ps1' -servicePrincipalClientId $ArcSp_id -servicePrincipalSecret $ArcSp_pwd -TenantId $MyTenantId -StorageAccountName $StorageAccountName -ContainerName $ContainerName -BlobName $BlobName -Force "
 # Use the CustomScript extension on the Arc enabled VM to setup the environment
 az connectedmachine extension create \
      --machine-name $ArcSqlVMname \
@@ -31,7 +31,7 @@ az connectedmachine extension create \
      --resource-group "$Seed-Demo" \
      --type "CustomScriptExtension" \
      --publisher "Microsoft.Compute" \
-     --settings "{\"commandToExecute\":\"powershell Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/gderossilive/GuestConfiguration/refs/heads/main/Files/IsoSetup.ps1' -OutFile 'c:\\windows\\\\temp\\IsoSetup.ps1'; powershell -File c:\\windows\\\temp\\IsoSetup.ps1 -servicePrincipalClientId $ArcSp_id -servicePrincipalSecret $ArcSp_pwd -TenantId $MyTenantId -StorageAccountName $StorageAccountName -ContainerName $ContainerName -BlobName $BlobName -Force \"}" \
+     --settings "{\"commandToExecute\":\"powershell Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/gderossilive/GuestConfiguration/refs/heads/main/Files/IsoSetup.ps1' -OutFile 'c:\\windows\\\temp\\IsoSetup.ps1'; powershell -File c:\\windows\\\temp\\IsoSetup.ps1 -servicePrincipalClientId $ArcSp_id -servicePrincipalSecret $ArcSp_pwd -TenantId $MyTenantId -StorageAccountName $StorageAccountName -ContainerName $ContainerName -BlobName $BlobName -Force \"}" \
      --enable-auto-upgrade true
 
 # setup the GuestConfiguration extension on the Arc enabled VM to install SQL Server

@@ -9,6 +9,7 @@ ArcSp_id=$(az ad sp list --filter "displayname eq 'ArcDeploySP-$Seed'" --query "
 # Assign the required roles to the Arc Service Principal
 az role assignment create --assignee $ArcSp_id --role "Azure Connected Machine Onboarding" --scope "//subscriptions/$MySubscriptionId/resourceGroups/$Seed-Demo"
 
+echo $adminPassword
 # To onboard on Arc this VM: 
 #   1 - Open an RDP session on the VM 
 #   2 - Run the output of the following command in a elevated powershell

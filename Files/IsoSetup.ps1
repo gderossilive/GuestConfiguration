@@ -8,6 +8,7 @@ param(
 )
 
 Write-Host "Installing necessary packages..." -ForegroundColor Green
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name SqlServerDsc -Force
 Install-Module sqlserver -Force
 #Install-Module -Name Az -Repository PSGallery -Force

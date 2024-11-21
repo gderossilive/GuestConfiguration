@@ -21,8 +21,6 @@ echo "$Seed"
 # generate a random password choosing 7 characters from the alphabet a..z + A..Z + 0..9
 adminPassword=$(printf -v s '%s' {a..z} {A..Z} {0..9}; echo ${s:$((RANDOM % ${#s})):12} | base64)
 
-echo $adminPassword
-
 # Create the resource group
 az group create --name "$Seed-Demo" --location "$location"
 
