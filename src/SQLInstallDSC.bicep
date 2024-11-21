@@ -28,7 +28,7 @@ resource myConfiguration 'Microsoft.GuestConfiguration/guestConfigurationAssignm
   location: location
   properties: {
     guestConfiguration: {
-      name: sqlServerName
+      name: 'SQLServerInstall'
       contentUri: contentUri
       contentHash: contentHash
       version: version
