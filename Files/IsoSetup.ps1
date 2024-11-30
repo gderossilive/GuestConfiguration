@@ -11,11 +11,15 @@ Write-Host "Installing necessary packages..." -ForegroundColor Green
 Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
 Install-Module -Name SqlServerDsc -Force
 Install-Module sqlserver -Force
-#Install-Module -Name Az -Repository PSGallery -Force
+$ProgressPreference = 'SilentlyContinue'
+Invoke-WebRequest -Uri "https://aka.ms/downloadazcopy-v10-windows" -OutFile "D:\azcopy.zip"
+Expand-Archive -Path "D:\azcopy.zip" -DestinationPath "D:\"
+Copy-Item -Path "D:\azcopy_windows_amd64_10.27.1\azcopy.exe" -Destination "C:\Windows\System32\"
 
-$Resource="https://$StorageAccountName.blob.core.windows.net"
+
 
 Write-Host "Getting access token..." -ForegroundColor Green
+$Resource="https://$StorageAccountName.blob.core.windows.net"
 # Get the access token
 $Body = @{
     grant_type    = "client_credentials"
@@ -34,10 +38,6 @@ $Headers = @{
 
 Write-Host "Downloading SQL Server ISO..." -ForegroundColor Green
 # Download the SQL Server ISO via azcopy
-$ProgressPreference = 'SilentlyContinue'
-Invoke-WebRequest -Uri "https://aka.ms/downloadazcopy-v10-windows" -OutFile "D:\azcopy.zip"
-Expand-Archive -Path "D:\azcopy.zip" -DestinationPath "D:\"
-Copy-Item -Path "D:\azcopy_windows_amd64_10.27.1\azcopy.exe" -Destination "C:\Windows\System32\"
 azcopy login --identity 
 azcopy copy "https://$StorageAccountName.blob.core.windows.net/$ContainerName/$BlobName" "D:\SQLServer2022-x64-ENU.iso"
 

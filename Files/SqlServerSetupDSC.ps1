@@ -7,13 +7,11 @@ Configuration SQLServerSetup {
     )
 
     Import-DscResource -ModuleName SqlServerDsc
-    Import-DscResource –ModuleName 'PSDesiredStateConfiguration'
+    Import-DscResource -ModuleName 'PSDesiredStateConfiguration'
 
     Node localhost {
         SqlSetup 'InstallDefaultInstance' {
             InstanceName = "MSSQLSERVER"
-            ProtocolName = 'TcpIp'
-            Enabled = $true
             SourcePath = $SourcePath
             Features = 'SQLENGINE'
             SQLSysAdminAccounts = 'gdradmin'
@@ -21,13 +19,28 @@ Configuration SQLServerSetup {
             InstallSharedWOWDir = 'C:\\Program Files (x86)\\Microsoft SQL Server'
             InstanceDir = 'C:\\Program Files\\Microsoft SQL Server'
         }
-    }
 
-    Service 'SQLServerService' {
-        Name = "MSSQLSERVER"
-        Ensure = "Present"
-        State = "Running"
-        DependsOn = "[SqlProtocol]EnableTcpIp"
+        SqlProtocol 'EnableTcpIp' {
+            InstanceName = "MSSQLSERVER"
+            ProtocolName = 'TcpIp'
+            Enabled = $true
+            DependsOn = "[SqlSetup]InstallDefaultInstance"
+        }
+
+        Service 'SQLServerService' {
+            Name = "MSSQLSERVER"
+            Ensure = "Present"
+            State = "Running"
+            DependsOn = "[SqlProtocol]EnableTcpIp"
+        }
+
+        Service 'EnsureSQLBrowserRunning' {
+            Name = "SQLBrowser"
+            Ensure = 'Present'
+            State = 'Running'
+            StartupType = 'Automatic'
+            DependsOn = "[SqlSetup]InstallDefaultInstance"
+        }
     }
 }
 

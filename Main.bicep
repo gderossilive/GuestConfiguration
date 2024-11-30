@@ -24,14 +24,9 @@ param GatewaySubnetAddressPrefix string
 param BastionHostName string = 'Bastion-${Seed}'
 param BastionPublicIpName string = 'BastionPublicIp-${Seed}'
 
-param WinCommand string = ''
-param LinCommand string = ''
-param LinNum int = 0
+// Virtual Machines
 param WinNum int = 0
 param SQLNum int = 0
-param WinVMname string = 'WinVM-${Seed}'
-param LinVMname string = 'LinVM-${Seed}'
-param CustomDnsServer string =''
 param rnd string = substring(uniqueString(utcNow()),0,5)
 param vmsize string = 'Standard_D2s_v3'
 

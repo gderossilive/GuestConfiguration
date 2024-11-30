@@ -1,12 +1,12 @@
 #!/bin/bash
+# Retrieve the vm names
 ArcWinVMname=$(az deployment sub show --name "CoreDeploy-$Seed" --query properties.outputs.winVMsName.value[0].name -o tsv)
 ArcSqlVMname=$(az deployment sub show --name "CoreDeploy-$Seed" --query properties.outputs.sqlVMsName.value[0].name -o tsv)
-#$AKSName=az deployment sub show --name "CoreDeploy-$Seed" --query properties.outputs.aksName.value -o tsv
-# get AKS cluster name
-#AksName=$(az aks show --resource-group "$Seed-Demo" --name "AKS-$Seed" --query name -o tsv)
+# build the list of VMs to be setup
 ArcWinlist="[\"$ArcWinVMname\"]"
 ArcSqllist="[\"$ArcSqlVMname\"]"
 
+# Set the storage account and blob details where to download the SQLServer 2022 ISO
 StorageAccountName="gdrrepo3423"
 ContainerName="iso"
 BlobName="SQLServer2022-x64-ENU.iso"
@@ -22,7 +22,7 @@ az role assignment create --assignee $ArcVmManagedIdentity \
 # Allow installing extensions without prompt
 az config set extension.use_dynamic_install=yes_without_prompt
 
-# Use the CustomScript extension on the Arc enabled VM to setup the environment
+# Use the CustomScript extension on the Arc enabled VM to download the SQLServer ISO and extract it in the C:\SQLServer2022 folder 
 az connectedmachine extension create \
      --machine-name $ArcSqlVMname \
      --location $location \
@@ -42,6 +42,17 @@ az connectedmachine extension create \
      --type "CustomScriptExtension" \
      --publisher "Microsoft.Compute" \
      --settings "{\"commandToExecute\":\"powershell -File c:\\windows\\\temp\\IsoSetup.ps1 -servicePrincipalClientId $ArcSp_id -servicePrincipalSecret $ArcSp_pwd -TenantId $MyTenantId -StorageAccountName $StorageAccountName -ContainerName $ContainerName -BlobName $BlobName -Force \"}" \
+     --enable-auto-upgrade true
+
+# Use the CustomScript extension on the Arc enabled VM to install SQL Server
+az connectedmachine extension create \
+     --machine-name $ArcSqlVMname \
+     --location $location \
+     --name 'CustomScriptExtension' \
+     --resource-group "$Seed-Demo" \
+     --type "CustomScriptExtension" \
+     --publisher "Microsoft.Compute" \
+     --settings "{\"commandToExecute\":\"powershell Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/gderossilive/GuestConfiguration/refs/heads/main/Files/SqlServerSetupDSC.ps1' -OutFile 'c:\\windows\\\temp\\SqlServerSetupDSC.ps1'; powershell -File c:\\windows\\\temp\\SqlServerSetupDSC.ps1  -Force \"}" \
      --enable-auto-upgrade true
 
 # setup the GuestConfiguration extension on the Arc enabled VM to install SQL Server
