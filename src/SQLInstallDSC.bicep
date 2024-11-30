@@ -23,7 +23,7 @@ resource vmExtension 'Microsoft.HybridCompute/machines/extensions@2024-07-31-pre
 }*/
 
 resource myConfiguration 'Microsoft.GuestConfiguration/guestConfigurationAssignments@2020-06-25' = {
-  name: sqlServerName
+  name: 'SQLServerInstall'
   scope: myVM
   location: location
   properties: {

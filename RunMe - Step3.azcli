@@ -22,7 +22,6 @@ az role assignment create --assignee $ArcVmManagedIdentity \
 # Allow installing extensions without prompt
 az config set extension.use_dynamic_install=yes_without_prompt
 
-echo "powershell Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/gderossilive/GuestConfiguration/refs/heads/main/Files/IsoSetup.ps1' -OutFile 'c:\\windows\\\temp\\IsoSetup.ps1'; powershell -File 'c:\\windows\\\temp\\IsoSetup.ps1' -servicePrincipalClientId $ArcSp_id -servicePrincipalSecret $ArcSp_pwd -TenantId $MyTenantId -StorageAccountName $StorageAccountName -ContainerName $ContainerName -BlobName $BlobName -Force "
 # Use the CustomScript extension on the Arc enabled VM to setup the environment
 az connectedmachine extension create \
      --machine-name $ArcSqlVMname \
@@ -31,7 +30,18 @@ az connectedmachine extension create \
      --resource-group "$Seed-Demo" \
      --type "CustomScriptExtension" \
      --publisher "Microsoft.Compute" \
-     --settings "{\"commandToExecute\":\"powershell Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/gderossilive/GuestConfiguration/refs/heads/main/Files/IsoSetup.ps1' -OutFile 'c:\\windows\\\temp\\IsoSetup.ps1'; powershell -File c:\\windows\\\temp\\IsoSetup.ps1 -servicePrincipalClientId $ArcSp_id -servicePrincipalSecret $ArcSp_pwd -TenantId $MyTenantId -StorageAccountName $StorageAccountName -ContainerName $ContainerName -BlobName $BlobName -Force \"}" \
+     --settings "{\"commandToExecute\":\"powershell Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/gderossilive/GuestConfiguration/refs/heads/main/Files/IsoSetup.ps1' -OutFile 'c:\\windows\\\temp\\IsoSetup.ps1' \"}" \
+     --enable-auto-upgrade true
+
+# echo "powershell -File 'c:\\windows\\\temp\\IsoSetup.ps1' -servicePrincipalClientId $ArcSp_id -servicePrincipalSecret $ArcSp_pwd -TenantId $MyTenantId -StorageAccountName $StorageAccountName -ContainerName $ContainerName -BlobName $BlobName -Force "
+az connectedmachine extension create \
+     --machine-name $ArcSqlVMname \
+     --location $location \
+     --name 'CustomScriptExtension' \
+     --resource-group "$Seed-Demo" \
+     --type "CustomScriptExtension" \
+     --publisher "Microsoft.Compute" \
+     --settings "{\"commandToExecute\":\"powershell -File c:\\windows\\\temp\\IsoSetup.ps1 -servicePrincipalClientId $ArcSp_id -servicePrincipalSecret $ArcSp_pwd -TenantId $MyTenantId -StorageAccountName $StorageAccountName -ContainerName $ContainerName -BlobName $BlobName -Force \"}" \
      --enable-auto-upgrade true
 
 # setup the GuestConfiguration extension on the Arc enabled VM to install SQL Server
@@ -43,49 +53,3 @@ az deployment group create \
 		  sqlServerName=$ArcSqlVMname \
 		  version='1.3' \
 		  contentHash='ac94b0f0911522bb5bd83bb5c665acedb93b03714159cfd207e812c2556e36e4'
-
-
-# ------------------ END OF FILE ------------------
-az connectedmachine extension create \
-	--machine-name $ArcWinVMname \
-	--location $location \
-	--name 'AzureMonitorWindowsAgent' \
-	--resource-group "$Seed-Demo" \
-	--type "AzureMonitorWindowsAgent" \
-	--publisher "Microsoft.Azure.Monitor" \
-	--enable-auto-upgrade true
-
-# setup the dependency agent on the Arc enabled VM
-az connectedmachine extension create \
-     --machine-name $ArcWinVMname \
-     --location $location \
-     --name 'DependencyAgentWindows' \
-     --resource-group "$Seed-Demo" \
-     --type "DependencyAgentWindows" \
-     --publisher "Microsoft.Azure.Monitoring.DependencyAgent" \
-     --settings "{\"enableAMA\": \"true\"}" \
-     --enable-auto-upgrade true
-
-# setup the Best Practice Assessment Platform on the Arc enabled VM
-az connectedmachine extension create \
-	--machine-name $ArcWinVMname \
-	--location $location \
-	--name 'assessmentplatform' \
-	--resource-group "$Seed-Demo" \
-	--type "assessmentplatform" \
-	--publisher "microsoft.serviceshub" \
-	--enable-auto-upgrade true
-
-# setup the Windows Server Best Practice Assessment on the Arc enabled VM
-az connectedmachine extension create \
-	--machine-name $ArcWinVMname \
-	--location $location \
-	--name 'windowsserverassessment' \
-	--resource-group "$Seed-Demo" \
-	--type "windowsserverassessment" \
-	--publisher "microsoft.serviceshub" \
-	--enable-auto-upgrade true
-     --settings "{\"isEnabled\": \"true\",\"addTaskOnInstallRequested\": \"true\",\"triggerRequested\": \"true\",\"triggerServerName\": \"$ArcWinVMname\",\"triggerLogAnalyticsWorkspaceFullId\": \"$LawResourceId\",\"triggerLogAnalyticsWorkspaceId\": \"$LawId\",\"triggerLogAnalyticsWorkspaceName\": \"$LAWname\"}" \
-
-# assess the patches on the Arc enabled VM
-az connectedmachine assess-patches -g "$Seed-Demo" -n $ArcWinVMname
