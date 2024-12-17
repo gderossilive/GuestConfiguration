@@ -14,7 +14,8 @@ subscriptionID=$(az account show --query id -o tsv)
 
 if [ "$subscriptionID" != "$MySubscriptionId" ]; then
     echo "You are not in the correct subscription. Please login."
-    az login --tenant $MyTenantId --use-device-code
+    #az login --tenant $MyTenantId --use-device-code
+    az login --scope https://management.core.windows.net//.default --tenant $MyTenantId
     az account set --subscription $MySubscriptionId # MCAPS tenant
 fi
 
@@ -23,30 +24,32 @@ read -p "Enter the Seed value: " Seed
 
 # find the secret value in the key vault
 adminPassword=$(az keyvault secret show --name "adminPassword" --vault-name "KV-$Seed" --query "value" -o tsv)
+ArcSp_id=$(az keyvault secret show --name "SPid" --vault-name "KV-$Seed" --query "value" -o tsv)
+ArcSp_pwd=$(az keyvault secret show --name "SPpwd" --vault-name "KV-$Seed" --query "value" -o tsv)
 
 ArcWinVMname=$(az deployment sub show --name "CoreDeploy-$Seed" --query properties.outputs.winVMsName.value[0].name -o tsv)
 ArcSqlVMname=$(az deployment sub show --name "CoreDeploy-$Seed" --query properties.outputs.sqlVMsName.value[0].name -o tsv)
 
 # find the Application ID of the service principal
-CopSp_id=$(az ad sp list --display-name "CopilotReaderSP-$Seed" --query "[0].appId" -o tsv)
+#CopSp_id=$(az ad sp list --display-name "CopilotReaderSP-$Seed" --query "[0].appId" -o tsv)
 
 # find the secret value in the key vault
-CopSp_pwd=$(az keyvault secret show --name "SP-Secret" --vault-name "KV-$Seed" --query "value" -o tsv)
+#CopSp_pwd=$(az keyvault secret show --name "SP-Secret" --vault-name "KV-$Seed" --query "value" -o tsv)
 
 # find the name of the key vault
 KVname=$(az deployment sub show --name "CoreDeploy-$Seed" --query properties.outputs.kvName.value -o tsv)
 # find the name of the log analytics workspace
 LAWname=$(az deployment sub show --name "CoreDeploy-$Seed" --query properties.outputs.laWname.value -o tsv)
 
-openAICustomDomainName=$(az deployment group show --name "OpenAIDeploy-$Seed" --resource-group "$Seed-Demo" --query properties.outputs.openAIName.value -o tsv)
-openAIdeploymentName=$(az deployment group show --name "OpenAIDeploy-$Seed" --resource-group "$Seed-Demo" --query properties.outputs.openAIdeploymentName.value -o tsv)
+#openAICustomDomainName=$(az deployment group show --name "OpenAIDeploy-$Seed" --resource-group "$Seed-Demo" --query properties.outputs.openAIName.value -o tsv)
+#openAIdeploymentName=$(az deployment group show --name "OpenAIDeploy-$Seed" --resource-group "$Seed-Demo" --query properties.outputs.openAIdeploymentName.value -o tsv)
 
 
-echo "Client ID: $CopSp_id
-Client Secret: $CopSp_pwd 
+echo "Client ID: $ArcSp_id
+Client Secret: $ArcSp_pwd 
 Tenant ID: $MyTenantId 
 Key Vault Name: $KVname 
 Log Analytics Workspace Name: $LAWname 
 Resource Group Name: $Seed-Demo
-OpenAI Service Name: $openAICustomDomainName 
-OpenAI Deployment Name: $openAIdeploymentName"
+Windows Server VM Name: $ArcWinVMname 
+SQL Server VM Name: $ArcSqlVMname"

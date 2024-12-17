@@ -44,7 +44,7 @@ az connectedmachine extension create \
      --settings "{\"commandToExecute\":\"powershell -File c:\\windows\\\temp\\IsoSetup.ps1 -servicePrincipalClientId $ArcSp_id -servicePrincipalSecret $ArcSp_pwd -TenantId $MyTenantId -StorageAccountName $StorageAccountName -ContainerName $ContainerName -BlobName $BlobName -Force \"}" \
      --enable-auto-upgrade true
 
-# Use the CustomScript extension on the Arc enabled VM to install SQL Server
+# Use the CustomScript extension on the Arc enabled VM to install SQL Server and its prerequisites for Best Practice Assessment
 az connectedmachine extension create \
      --machine-name $ArcSqlVMname \
      --location $location \

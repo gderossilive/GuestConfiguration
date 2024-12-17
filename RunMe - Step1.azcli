@@ -24,8 +24,8 @@ adminUsername='gdradmin'
 # generate a random password choosing 7 characters from the alphabet a..z + A..Z + 0..9
 adminPassword=$(printf -v s '%s' {a..z} {A..Z} {0..9}; echo ${s:$((RANDOM % ${#s})):12} | base64)
 
-# Create the resource group
-az group create --name "$Seed-Demo" --location "$location"
+# Create the resource group with the automatic SQL Server extension deployment tag set to PAYG
+az group create --name "$Seed-Demo" --location "$location" --tags "ArcSQLServerExtensionDeployment=PAYG"
 
 # Create the hub&spoke infrastructure
 az deployment sub create \
@@ -39,12 +39,5 @@ az deployment sub create \
           MyObjectId=$MyObecjectId \
           adminUsername='gdradmin' \
           adminPassword=$adminPassword \
-          WinNum=0 \
+          WinNum=1 \
           SQLNum=1
-
-
-
-# To install SQL on the SQL-1 VM, you need:
-#   1 - Open an RDP session on the VM 
-#   2 - Copy and Run the following command in a elevated powershell
-#    SQLInstallDSC.ps1
